@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <script type="application/javascript">
+
+function draw() {
+  var canvas = document.getElementById("canvas");
+  if (canvas.getContext) {
+    var ctx = canvas.getContext("2d");
+
+    // 填充三角形
+    ctx.beginPath();
+    ctx.moveTo(25, 25);
+    ctx.lineTo(105, 25);
+    ctx.lineTo(25, 105);
+    ctx.fill();
+
+    // 描边三角形
+    ctx.beginPath();
+    ctx.moveTo(125, 125);
+    ctx.lineTo(125, 45);
+    ctx.lineTo(45, 125);
+    ctx.closePath();
+    ctx.stroke();
+
+
+    ctx.beginPath();
+    ctx.moveTo(200, 200);
+    ctx.lineTo(225, 175);
+    ctx.lineTo(175, 175);
+    ctx.closePath();
+    ctx.stroke();
+
+      ctx.beginPath();
+    ctx.moveTo(200, 200);
+    ctx.lineTo(225, 225);
+    ctx.lineTo(175, 225);
+    ctx.fill();
+
+  }
+}
+    
+    </script>
+  </head>
+  <body onload="draw();">
+    <canvas id="canvas" width="400" height="400"></canvas>
+  </body>
+</html>
+
+

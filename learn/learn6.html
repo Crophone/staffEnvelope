@@ -1,0 +1,103 @@
+<html>
+  <head>
+    <script type="application/javascript">
+function drawSmile(){
+  var canvas = document.getElementById("canvas");
+  if (canvas.getContext) {
+    var ctx = canvas.getContext("2d");
+  
+        // 画微笑
+        ctx.beginPath();
+        var x = 200; // x 坐标值
+        var y = 200; // y 坐标值
+        var radius = 50; // 圆弧半径
+        var startAngle = 0; // 开始点
+
+        // 顺时针旋转180度
+        var endAngle = Math.PI ; // 结束点
+        var anticlockwise = false; 
+        ctx.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+        ctx.stroke();
+
+
+        // 画左眼
+       ctx.beginPath();
+        var x = 180; // x 坐标值
+        var y = 190; // y 坐标值
+        var radius = 5; // 圆弧半径
+        var startAngle = 0; // 开始点
+
+        // 顺时针旋转180度
+        var endAngle = Math.PI*2 ; // 结束点
+        var anticlockwise = false; 
+        ctx.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+        ctx.fill();
+
+        // 画右眼
+        ctx.beginPath();
+        var x = 220; // x 坐标值
+        var y = 190; // y 坐标值
+        var radius = 5; // 圆弧半径
+        var startAngle = 0; // 开始点
+
+        // 顺时针旋转180度
+        var endAngle = Math.PI*2 ; // 结束点
+        var anticlockwise = false; 
+        ctx.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+        ctx.fill();
+
+        // 画微笑
+        ctx.beginPath();
+        var x = 200; // x 坐标值
+        var y = 220; // y 坐标值
+        var radius = 10; // 圆弧半径
+        var startAngle = 0; // 开始点
+
+        // 顺时针旋转180度
+        var endAngle = Math.PI ; // 结束点
+        var anticlockwise = false; 
+        ctx.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+        ctx.stroke();
+
+  }
+
+}
+
+
+function draw() {
+  var canvas = document.getElementById("canvas");
+  if (canvas.getContext) {
+    var ctx = canvas.getContext("2d");
+
+    drawSmile()
+
+
+        for (var i = 0; i < 4; i++) {
+      for (var j = 0; j < 3; j++) {
+        ctx.beginPath();
+        var x = 25 + j * 50; // x 坐标值
+        var y = 25 + i * 50; // y 坐标值
+        var radius = 20; // 圆弧半径
+        var startAngle = 0; // 开始点
+        var endAngle = Math.PI + (Math.PI * j) / 2; // 结束点
+        var anticlockwise = i % 2 == 0 ? false : true; // 顺时针或逆时针
+
+        ctx.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+        if (i > 1) {
+          ctx.fill();
+        } else {
+          ctx.stroke();
+        }
+      }
+    }
+  }
+}
+    
+    </script>
+  </head>
+  <body onload="draw();">
+    <canvas id="canvas" width="800" height="800"></canvas>
+  </body>
+</html>
+
+

@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <script type="application/javascript">
+ 
+ function draw() {
+  var ctx = document.getElementById("canvas").getContext("2d");
+  // i是Y列，j是X列
+  for (var i = 0; i < 3; i++) {
+    for (var j = 0; j < 3; j++) {
+      ctx.save();
+      ctx.fillStyle = "rgb(" + 51 * j + ", " + (255 - 51 * j) + ", 255)";
+      // ctx.translate(10 + j * 50, 10 + i * 50);
+      ctx.fillRect(10 + j * 50,10 + i * 50 , 25, 25);
+      ctx.restore();
+    }
+  }
+}
+ 
+    
+    </script>
+  </head>
+  <body onload="draw();">
+    <canvas id="canvas" width="800" height="800"></canvas>
+  </body>
+</html>
+
+

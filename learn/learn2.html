@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <script type="application/javascript">
+function draw() {
+  const canvas = document.getElementById("canvas");
+  if (canvas.getContext) {
+    const ctx = canvas.getContext("2d");
+
+    ctx.fillRect(0, 0, 100, 100);
+    ctx.clearRect(20, 20, 60, 60);
+    ctx.strokeRect(40, 40, 20, 20);
+  }
+}
+    
+    </script>
+  </head>
+  <body onload="draw();">
+    <canvas id="canvas" width="200" height="200"></canvas>
+  </body>
+</html>

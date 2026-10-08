@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五线谱信纸 - 用音乐书写你的信件</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎵 五线谱信纸</h1>
+            <p class="subtitle">在五线谱上书写你的中文信件，让文字化作音符</p>
+        </header>
+
+        <div class="main-content">
+            <aside class="control-panel">
+                <div class="control-group">
+                    <label for="letterTitle">信件标题</label>
+                    <input type="text" id="letterTitle" placeholder="给你的信" value="给你的信">
+                </div>
+
+                <div class="control-group">
+                    <label for="letterContent">信件内容</label>
+                    <textarea id="letterContent" placeholder="在这里写下你想说的话...">亲爱的朋友：
+
+展信佳！
+
+当你看到这封信的时候，
+愿五线谱上的每一个字，
+都化作美妙的音符，
+轻轻飘进你的心里。
+
+祝你每天都有好心情！
+
+                                    此致
+                                    敬礼
+
+                                    你的朋友
+                                    2026年9月</textarea>
+                </div>
+
+                <div class="control-row">
+                    <div class="control-group half">
+                        <label for="fontSize">字号</label>
+                        <input type="range" id="fontSize" min="14" max="36" value="22">
+                        <span id="fontSizeValue">22px</span>
+                    </div>
+                    <div class="control-group half">
+                        <label for="lineHeight">行间距</label>
+                        <input type="range" id="lineHeight" min="50" max="120" value="80">
+                        <span id="lineHeightValue">80px</span>
+                    </div>
+                </div>
+
+                <div class="control-row">
+                    <div class="control-group half">
+                        <label for="textColor">文字颜色</label>
+                        <input type="color" id="textColor" value="#2c2c4a">
+                    </div>
+                    <div class="control-group half">
+                        <label for="staffColor">五线谱颜色</label>
+                        <input type="color" id="staffColor" value="#000000">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="fontFamily">字体</label>
+                    <select id="fontFamily">
+                        <option value="'Ma Shan Zheng', 'KaiTi', '楷体', serif">楷体 (手写风)</option>
+                        <option value="'ZCOOL XiaoWei', 'SimSun', '宋体', serif">宋体 (典雅)</option>
+                        <option value="'Noto Serif SC', 'SimHei', '黑体', sans-serif">黑体 (现代)</option>
+                        <option value="'STXingkai', 'Xingkai SC', '行楷', cursive">行楷 (飘逸)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>装饰选项</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="showClef" checked>
+                            <span>显示谱号</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="showNotes" checked>
+                            <span>文字间显示音符</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="showBorder" checked>
+                            <span>显示信纸边框</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" id="renderBtn">🎨 重新绘制</button>
+                    <button class="btn btn-success" id="exportBtn">💾 导出图片</button>
+                    <button class="btn btn-secondary" id="resetBtn">↺ 重置</button>
+                </div>
+            </aside>
+
+            <main class="canvas-container">
+                <div class="canvas-wrapper">
+                    <canvas id="staffCanvas" width="800" height="1000"></canvas>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+    <script src="script.js"></script>
+</body>
+</html>
