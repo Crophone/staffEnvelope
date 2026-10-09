@@ -1,188 +1,113 @@
-<html>
-  <head>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五线谱信纸 - 用音乐书写你的信件</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎵 五线谱信纸</h1>
+            <p class="subtitle">在五线谱上书写你的中文信件，让文字化作音符</p>
+        </header>
 
-<style>
-        /* 清除默认边距，防止出现滚动条 */
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-        /* 让 canvas 以块级元素占满窗口 */
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-    </style>
+        <div class="main-content">
+            <aside class="control-panel">
+                <div class="control-group">
+                    <label for="letterTitle">信件标题</label>
+                    <input type="text" id="letterTitle" placeholder="给你的信" value="给你的信">
+                </div>
 
-  </head>
-  <body onload="draw();">
-    <canvas id="canvas"   ></canvas>
+                <div class="control-group">
+                    <label for="letterContent">信件内容</label>
+                    <textarea id="letterContent" placeholder="在这里写下你想说的话...">亲爱的朋友：
 
-<script type="application/javascript">
+展信佳！
 
+当你看到这封信的时候，
+愿五线谱上的每一个字，
+都化作美妙的音符，
+轻轻飘进你的心里。
 
+祝你每天都有好心情！
 
+                                    此致
+                                    敬礼
 
-function draw() {
+                                    你的朋友
+                                    2026年9月</textarea>
+                </div>
 
+                <div class="control-row">
+                    <div class="control-group half">
+                        <label for="fontSize">字号</label>
+                        <input type="range" id="fontSize" min="14" max="36" value="22">
+                        <span id="fontSizeValue">22px</span>
+                    </div>
+                    <div class="control-group half">
+                        <label for="lineHeight">行间距</label>
+                        <input type="range" id="lineHeight" min="50" max="120" value="80">
+                        <span id="lineHeightValue">80px</span>
+                    </div>
+                </div>
 
-    const text = 
-    `亲爱的朋友：
-    见字如面。愿这封信抵达时，你一切安好。
-    素胚勾勒,出青花,筆鋒濃轉淡,瓶身描繪的牡丹,一如妳初妝，冉冉檀香,透過窗心事我了然,宣紙上走筆至此擱一半。
-    釉色渲染仕女圖韻味被私藏,而妳嫣然的一笑如含苞待放,妳的美一縷飄散 去到我去不了的地方。
-    天青色等煙雨，而我在等妳，炊煙裊裊昇起，隔江千萬里，在瓶底書漢隸仿前朝的飄逸，就當我為遇見妳伏筆。
-    天青色等煙雨，而我在等妳，月色被打撈起 暈開了結局，如傳世的青花瓷自顧自美麗，妳眼帶笑意。
-    色白花青的錦鯉躍然於碗底，臨摹宋體落款時 卻惦記著你，你隱藏在窯燒裡千年的秘密，極細膩 猶如繡花針落地，簾外芭蕉惹驟雨 門環惹銅綠，而我路過那江南小鎮惹了你，在潑墨山水畫裡 你從墨色深處被隱去。
-    天青色等煙雨，而我在等你，炊煙裊裊昇起，隔江千萬里，在瓶底書漢隸仿前朝的飄逸，就當我為遇見你伏筆，天青色等煙雨，而我在等你，月色被打撈起，暈開了結局，如傳世的青花瓷自顧自美麗，你眼帶笑意，
-    天青色等煙雨，而我在等你，炊煙裊裊昇起，隔江千萬里，在瓶底書漢隸仿前朝的飄逸，就當我為遇見你伏筆，天青色等煙雨，而我在等你，月色被打撈起，暈開了結局，如傳世的青花瓷自顧自美麗，你眼帶笑意。
-    `;
-    
+                <div class="control-row">
+                    <div class="control-group half">
+                        <label for="textColor">文字颜色</label>
+                        <input type="color" id="textColor" value="#2c2c4a">
+                    </div>
+                    <div class="control-group half">
+                        <label for="staffColor">五线谱颜色</label>
+                        <input type="color" id="staffColor" value="#000000">
+                    </div>
+                </div>
 
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-   
+                <div class="control-group">
+                    <label for="fontFamily">字体</label>
+                    <select id="fontFamily">
+                        <option value="'Ma Shan Zheng', 'KaiTi', '楷体', serif">楷体 (手写风)</option>
+                        <option value="'ZCOOL XiaoWei', 'SimSun', '宋体', serif">宋体 (典雅)</option>
+                        <option value="'Noto Serif SC', 'SimHei', '黑体', sans-serif">黑体 (现代)</option>
+                        <option value="'STXingkai', 'Xingkai SC', '行楷', cursive">行楷 (飘逸)</option>
+                    </select>
+                </div>
 
-    var width = window.innerWidth
-    var height = window.innerHeight;
+                <div class="control-group">
+                    <label>装饰选项</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="showClef" checked>
+                            <span>显示谱号</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="showNotes" checked>
+                            <span>文字间显示音符</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="showBorder" checked>
+                            <span>显示信纸边框</span>
+                        </label>
+                    </div>
+                </div>
 
+                <div class="button-group">
+                    <button class="btn btn-primary" id="renderBtn">🎨 重新绘制</button>
+                    <button class="btn btn-success" id="exportBtn">💾 导出图片</button>
+                    <button class="btn btn-secondary" id="resetBtn">↺ 重置</button>
+                </div>
+            </aside>
 
-    console.log("浏览器宽度"+width)
-    console.log("浏览器高度"+height)
+            <main class="canvas-container">
+                <div class="canvas-wrapper">
+                    <canvas id="staffCanvas" width="800" height="1000"></canvas>
+                </div>
+            </main>
+        </div>
+    </div>
 
-    // var width = window.screen.width
-    // var height =  window.screen.height
-
-    // 定一页11行
-    var lines =  11
-
-    var spacing  =  Math.floor( (height)/lines/8 )
-    var fontsize = spacing*5
-
-    canvas.width = width
-
-  // 计算文本一共需要多少行五线谱,从而计算所需要的高度
-    lines = countLines()
-    console.log("一共需要"+lines+"行五线谱")
-    function countLines() {
-    let  index = 0 
-    let line_index = 0
-      while(index < text.length){
-        let line_text = text.substring(line_index,index+1)
-        nextWidth = ctx.measureText(line_text).width;
-        // 换行
-        if(text.substring(index,index+1)=='\n'||nextWidth > width){
-          lines++ 
-          line_index = index
-          }
-      index++;
-      }
-      lines++
-      return lines<11?11:lines
-    }
-
-    canvas.height = spacing*4 + lines*spacing*8 
-   
-    console.log("canvas.height 高度"+canvas.height )
-
-
-
-  
-
-    var left = 0
-    var right = width
-    
-
-    var y = spacing/8
-    var color = '#000000';
-
-
-
-    var size = Math.floor(height/(spacing*4))
-
-    var number = (size/2) ;;
-    if(size%2==1){
-      number = (size/2) +1;
-    }
-    else{
-        number = (size/2) ;
-    }
-    
-    for(let i = 0;i< lines;i++){
-          console.log("正在绘制"+i+"行五线谱")
-          var space = spacing * i * 8
-          drawSingleStaff(ctx,left,right,10+y+space,spacing,color)
-    }
-
-    // ctx.fillText(text.substring(0,index+1), 10, 50)
-
-    // for(let i = 0;i< number;i++){
-    //     var space = spacing* i * 8
-    //    ctx.fillText(text, 10, 50+space)
-    // }
-
-
-    ctx.font = fontsize+"px serif";
-    console.log( ctx.font )
-
-     index = 0 
-     line = 0  
-     line_index = 0
-    typeWriter()
-    function typeWriter() {
-
-      if(index < text.length){
-        let line_text = text.substring(line_index,index+1)
-        nextWidth = ctx.measureText(line_text).width;
-        // 换行
-        if(text.substring(index,index+1)=='\n'||nextWidth > width){
-          console.log(`实际渲染的文本: ${text.substring(line_index,index+1)}`)
-          line++
-          line_index = index
-          }
-        
-        //动态加一个字
-      ctx.fillText(text.substring(line_index,index+1), 10, spacing*5  +  spacing*4*line*2)  
-      index++;
-        setTimeout(typeWriter, 100);
-      }
-    }
-
-  function  drawSingleStaff(ctx,left, right, y, spacing, color) {
-        ctx.strokeStyle = color;
-        ctx.globalAlpha = 1;
-        for (let i = 0; i < 5; i++) {
-            const lineY = y + i * spacing;
-            ctx.beginPath();
-            ctx.moveTo(left, lineY);
-            ctx.lineTo(right, lineY);
-            ctx.stroke();
-        }
-            // ctx.beginPath();
-            // ctx.moveTo(left, y);
-            // ctx.lineTo(left, y+4*spacing);
-            // ctx.moveTo(right, y);
-            // ctx.lineTo(right, y+4*spacing);
-            // ctx.stroke();
-    }
-
-
- 
-  
-
-  
-  }
- 
-
-
-    // window.addEventListener('resize', draw());
-    </script>
-    
-  </body>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+    <script src="script.js"></script>
+</body>
 </html>
-
-

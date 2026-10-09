@@ -101,7 +101,7 @@ class StaffLetter {
         const staffBlockHeight = lineHeight;
         const lineSpacingInStaff = staffBlockHeight / 10;
 
-        this.drawTitle(marginTop - 20, W, textColor, fontFamily, fontSize);
+        this.drawTitle(marginTop - 50, W, textColor, fontFamily, fontSize);
 
         const contentLines = this.letterContent.value.split('\n');
 
