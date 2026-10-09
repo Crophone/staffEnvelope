@@ -24,16 +24,24 @@
 
 <script type="application/javascript">
 
-window.addEventListener('resize', draw());
-class StaffLetter{
-}
 
-function resizeCanvas(){
-
-}
 
 
 function draw() {
+
+
+    const text = 
+    `亲爱的朋友：
+    见字如面。愿这封信抵达时，你一切安好。
+    素胚勾勒,出青花,筆鋒濃轉淡,瓶身描繪的牡丹,一如妳初妝，冉冉檀香,透過窗心事我了然,宣紙上走筆至此擱一半。
+    釉色渲染仕女圖韻味被私藏,而妳嫣然的一笑如含苞待放,妳的美一縷飄散 去到我去不了的地方。
+    天青色等煙雨，而我在等妳，炊煙裊裊昇起，隔江千萬里，在瓶底書漢隸仿前朝的飄逸，就當我為遇見妳伏筆。
+    天青色等煙雨，而我在等妳，月色被打撈起 暈開了結局，如傳世的青花瓷自顧自美麗，妳眼帶笑意。
+    色白花青的錦鯉躍然於碗底，臨摹宋體落款時 卻惦記著你，你隱藏在窯燒裡千年的秘密，極細膩 猶如繡花針落地，簾外芭蕉惹驟雨 門環惹銅綠，而我路過那江南小鎮惹了你，在潑墨山水畫裡 你從墨色深處被隱去。
+    天青色等煙雨，而我在等你，炊煙裊裊昇起，隔江千萬里，在瓶底書漢隸仿前朝的飄逸，就當我為遇見你伏筆，天青色等煙雨，而我在等你，月色被打撈起，暈開了結局，如傳世的青花瓷自顧自美麗，你眼帶笑意，
+    天青色等煙雨，而我在等你，炊煙裊裊昇起，隔江千萬里，在瓶底書漢隸仿前朝的飄逸，就當我為遇見你伏筆，天青色等煙雨，而我在等你，月色被打撈起，暈開了結局，如傳世的青花瓷自顧自美麗，你眼帶笑意。
+    `;
+    
 
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
@@ -41,22 +49,54 @@ function draw() {
 
     var width = window.innerWidth
     var height = window.innerHeight;
+
+
     console.log("浏览器宽度"+width)
     console.log("浏览器高度"+height)
 
-    // 一页11行
-    var lines = 11
     // var width = window.screen.width
     // var height =  window.screen.height
 
+    // 定一页11行
+    var lines =  11
+
+    var spacing  =  Math.floor( (height)/lines/8 )
+    var fontsize = spacing*5
+
     canvas.width = width
-    canvas.height = height
+
+  // 计算文本一共需要多少行五线谱,从而计算所需要的高度
+    lines = countLines()
+    console.log("一共需要"+lines+"行五线谱")
+    function countLines() {
+    let  index = 0 
+    let line_index = 0
+      while(index < text.length){
+        let line_text = text.substring(line_index,index+1)
+        nextWidth = ctx.measureText(line_text).width;
+        // 换行
+        if(text.substring(index,index+1)=='\n'||nextWidth > width){
+          lines++ 
+          line_index = index
+          }
+      index++;
+      }
+      lines++
+      return lines<11?11:lines
+    }
+
+    canvas.height = spacing*4 + lines*spacing*8 
+   
+    console.log("canvas.height 高度"+canvas.height )
+
+
+
+  
 
     var left = 0
     var right = width
     
 
-    var spacing  =  Math.floor( (height)/lines/8 )
     var y = spacing/8
     var color = '#000000';
 
@@ -73,12 +113,11 @@ function draw() {
     }
     
     for(let i = 0;i< lines;i++){
+          console.log("正在绘制"+i+"行五线谱")
           var space = spacing * i * 8
           drawSingleStaff(ctx,left,right,10+y+space,spacing,color)
     }
 
-  
-  
     // ctx.fillText(text.substring(0,index+1), 10, 50)
 
     // for(let i = 0;i< number;i++){
@@ -87,86 +126,33 @@ function draw() {
     // }
 
 
-        // 五线谱上面写字
-    function writeText(ctx,text){
-
-
-    }
-    
-
-    
-    const text = `亲爱的朋友：\n\n\n   见字如面。愿这封信抵达时，你一切安好。
-    素胚勾勒出青花筆鋒濃轉淡瓶身描繪的牡丹一如妳初妝，冉冉檀香透過窗心事我了然,宣紙上走筆至此擱一半。
-    釉色渲染仕女圖韻味被私藏,而妳嫣然的一笑如含苞待放,妳的美一縷飄散 去到我去不了的地方。
-    天青色等煙雨，而我在等妳，炊煙裊裊昇起，隔江千萬里，在瓶底書漢隸仿前朝的飄逸，就當我為遇見妳伏筆。
-    天青色等煙雨，而我在等妳，月色被打撈起 暈開了結局，如傳世的青花瓷自顧自美麗，妳眼帶笑意。`;
-    var fontsize = spacing * 5
-
     ctx.font = fontsize+"px serif";
     console.log( ctx.font )
 
-    let index = 0 
-    let line = 0  
-    let line_index = 0
+     index = 0 
+     line = 0  
+     line_index = 0
     typeWriter()
-
-
     function typeWriter() {
+
       if(index < text.length){
         let line_text = text.substring(line_index,index+1)
         nextWidth = ctx.measureText(line_text).width;
         // 换行
         if(text.substring(index,index+1)=='\n'||nextWidth > width){
+          console.log(`实际渲染的文本: ${text.substring(line_index,index+1)}`)
           line++
-          console.log(line)
-          line_index = index+1
-          index++
-        }
+          line_index = index
+          }
+        
         //动态加一个字
-      ctx.fillText(text.substring(line_index,index+1), 10, spacing*5+  spacing*4*line)  
-      console.log(`实际渲染的文本: ${text.substring(line_index,index+1)}`);
-        index++;
+      ctx.fillText(text.substring(line_index,index+1), 10, spacing*5  +  spacing*4*line*2)  
+      index++;
         setTimeout(typeWriter, 100);
       }
-
-}
-  
-
-
-
-
-  function getLineTextAndCount(ctx, text, maxWidth) {
-    let measuredWidth = 0;
-    let charCount = 0;
-    let lineText = "";
-
-    for (let i = 0; i < text.length; i++) {
-
-        const char = text[i];
-        // 1. 模拟加上当前字符后的总宽度
-        const nextWidth = ctx.measureText(lineText + char).width;
-        
-        // 2. 如果超过了最大宽度，则停止
-        if (nextWidth > maxWidth) {
-            break;
-        }
-        // 如果是换行符，则停止
-        if(char=='\n'){
-            break;
-        }
-        
-        lineText += char;
-        charCount++;
     }
 
-    return {
-        charCount: charCount, // 这一行能容纳的字数
-        text: lineText        // 这一行实际显示的文字
-    };
-}
-  
-
-function  drawSingleStaff(ctx,left, right, y, spacing, color) {
+  function  drawSingleStaff(ctx,left, right, y, spacing, color) {
         ctx.strokeStyle = color;
         ctx.globalAlpha = 1;
         for (let i = 0; i < 5; i++) {
@@ -183,9 +169,17 @@ function  drawSingleStaff(ctx,left, right, y, spacing, color) {
             // ctx.lineTo(right, y+4*spacing);
             // ctx.stroke();
     }
+
+
+ 
+  
+
   
   }
-    window.addEventListener('resize', draw());
+ 
+
+
+    // window.addEventListener('resize', draw());
     </script>
     
   </body>
