@@ -15,11 +15,15 @@ class StaffLetter {
         this._measureCtx = this._measureCanvas.getContext('2d');
         this.initElements();
         this.bindEvents();
-        this.extractAbcjsClefTemplate().then(() => {
-            this.render();
-        }).catch(() => {
-            this.render();
-        });
+
+        // 首屏先使用内置谱号立即渲染，避免 GitHub Pages 上第三方 CDN
+        // 加载失败或速度较慢时，整封信一直保持空白。
+        this.render();
+
+        // abcjs 仅作为渐进增强：提取成功后再用更精细的谱号重绘。
+        this.extractAbcjsClefTemplate()
+            .then(() => this.render())
+            .catch(() => {});
     }
 
     initElements() {
@@ -753,6 +757,22 @@ class StaffLetter {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    new StaffLetter();
-});
+function initStaffLetter() {
+    const pagesContainer = document.getElementById('pagesContainer');
+    if (!pagesContainer || pagesContainer.dataset.initialized === 'true') return;
+
+    pagesContainer.dataset.initialized = 'true';
+    try {
+        new StaffLetter();
+    } catch (error) {
+        pagesContainer.dataset.initialized = 'false';
+        console.error('五线谱信件初始化失败：', error);
+        pagesContainer.textContent = '信件加载失败，请刷新页面重试。';
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initStaffLetter, { once: true });
+} else {
+    initStaffLetter();
+}
