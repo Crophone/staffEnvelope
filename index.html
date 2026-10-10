@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>五线谱信纸 - 用音乐书写你的信件</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -49,11 +49,11 @@
                 <div class="control-row">
                     <div class="control-group half">
                         <label for="textColor">文字颜色</label>
-                        <input type="color" id="textColor" value="#2c2c4a">
+                        <input type="color" id="textColor" value="#000000">
                     </div>
                     <div class="control-group half">
                         <label for="staffColor">五线谱颜色</label>
-                        <input type="color" id="staffColor" value="#000000">
+                        <input type="color" id="staffColor" value="#3366cc">
                     </div>
                 </div>
 
@@ -65,6 +65,21 @@
                         <option value="'Noto Serif SC', 'SimHei', '黑体', sans-serif">黑体 (现代)</option>
                         <option value="'STXingkai', 'Xingkai SC', '行楷', cursive">行楷 (飘逸)</option>
                     </select>
+                </div>
+
+                <div class="control-group">
+                    <label>信件排版</label>
+                    <div class="mode-toggle">
+                        <label class="mode-option">
+                            <input type="radio" name="letterMode" value="single" checked>
+                            <span>📜 单页长信</span>
+                        </label>
+                        <label class="mode-option">
+                            <input type="radio" name="letterMode" value="multi">
+                            <span>📄 多页信件</span>
+                        </label>
+                    </div>
+                    <p class="mode-hint" id="modeHint">所有内容合并为一张纵向长信纸</p>
                 </div>
 
                 <div class="control-group">
@@ -94,7 +109,7 @@
 
             <main class="canvas-container">
                 <div class="canvas-wrapper">
-                    <svg id="staffSvg" xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000"></svg>
+                    <div class="pages-container" id="pagesContainer"></div>
                 </div>
             </main>
         </div>

@@ -2,9 +2,12 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 
 class StaffLetter {
     constructor() {
-        this.svg = document.getElementById('staffSvg');
+        this.pagesContainer = document.getElementById('pagesContainer');
+        this.svg = null;
+        this.pageSvgs = [];
         this.W = 800;
-        this.H = 1000;
+        this.pageH = 1000;
+        this.H = this.pageH;
         this.clefTemplate = null;
         this.clefBBox = { x: 0, y: 0, width: 24, height: 80 };
         this.clefStaffSpace = 10;
@@ -35,6 +38,8 @@ class StaffLetter {
         this.renderBtn = document.getElementById('renderBtn');
         this.exportBtn = document.getElementById('exportBtn');
         this.resetBtn = document.getElementById('resetBtn');
+        this.modeRadios = Array.from(document.querySelectorAll('input[name="letterMode"]'));
+        this.modeHint = document.getElementById('modeHint');
     }
 
     bindEvents() {
@@ -51,6 +56,8 @@ class StaffLetter {
         [this.textColor, this.staffColor, this.fontFamily, this.showClef, this.showNotes, this.showBorder].forEach(el => {
             el.addEventListener('change', () => this.render());
         });
+
+        this.modeRadios.forEach(r => r.addEventListener('change', () => this.render()));
 
         this.renderBtn.addEventListener('click', () => this.render());
         this.exportBtn.addEventListener('click', () => this.exportImage());
@@ -71,49 +78,69 @@ class StaffLetter {
 傻子才以为过家家才是爱情呢，世俗的心理真可怕。不听他们的，不听。不管天翻地覆也好，昏天黑地也好，我们到一起来寻找安谧。我觉得我提起笔来冥想的时候，还有坐在你面前的时候，都到了人所不知的世界。世界没有这个哪成呢？过去是没有它就活得没意思，现在没有你也没意思。`;
         this.fontSize.value = 22;
         this.lineHeight.value = 80;
-        this.textColor.value = '#2c2c4a';
-        this.staffColor.value = '#000000';
+        this.textColor.value = '#000000';
+        this.staffColor.value = '#3366cc';
         this.fontFamily.selectedIndex = 0;
         this.showClef.checked = true;
         this.showNotes.checked = true;
         this.showBorder.checked = true;
+        this.modeRadios.forEach(r => { r.checked = r.value === 'single'; });
         this.fontSizeValue.textContent = '22px';
         this.lineHeightValue.textContent = '80px';
         this.render();
     }
 
     exportImage() {
-        const clone = this.svg.cloneNode(true);
-        clone.setAttribute('xmlns', SVG_NS);
-        const style = document.createElementNS(SVG_NS, 'style');
-        style.textContent = `@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@400;600&display=swap');`;
-        clone.insertBefore(style, clone.firstChild);
+        const title = this.letterTitle.value || '无题';
+        const pages = this.pageSvgs.length ? this.pageSvgs : [this.svg];
+        const total = pages.length;
+        let hadError = false;
 
-        const serializer = new XMLSerializer();
-        let src = serializer.serializeToString(clone);
-        src = '<?xml version="1.0" standalone="no"?>\r\n' + src;
-        const svgBlob = new Blob([src], { type: 'image/svg+xml;charset=utf-8' });
-        const url = URL.createObjectURL(svgBlob);
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = this.W * 2;
-            canvas.height = this.H * 2;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#fffef9';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            URL.revokeObjectURL(url);
-            const link = document.createElement('a');
-            link.download = `五线谱信件_${this.letterTitle.value || '无题'}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        };
-        img.onerror = () => {
-            URL.revokeObjectURL(url);
-            alert('导出失败，请重试');
-        };
-        img.src = url;
+        const exportOne = (svg, i) => new Promise(resolve => {
+            const w = parseFloat(svg.getAttribute('width')) || this.W;
+            const h = parseFloat(svg.getAttribute('height')) || this.H;
+
+            const clone = svg.cloneNode(true);
+            clone.setAttribute('xmlns', SVG_NS);
+            const style = document.createElementNS(SVG_NS, 'style');
+            style.textContent = `@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@400;600&display=swap');`;
+            clone.insertBefore(style, clone.firstChild);
+
+            const serializer = new XMLSerializer();
+            let src = serializer.serializeToString(clone);
+            src = '<?xml version="1.0" standalone="no"?>\r\n' + src;
+            const svgBlob = new Blob([src], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(svgBlob);
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = w * 2;
+                canvas.height = h * 2;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#fffef9';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                URL.revokeObjectURL(url);
+                const link = document.createElement('a');
+                link.download = total > 1
+                    ? `五线谱信件_${title}_第${i + 1}页.png`
+                    : `五线谱信件_${title}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                setTimeout(resolve, 400);
+            };
+            img.onerror = () => {
+                URL.revokeObjectURL(url);
+                hadError = true;
+                resolve();
+            };
+            img.src = url;
+        });
+
+        pages.reduce((chain, svg, i) => chain.then(() => exportOne(svg, i)), Promise.resolve())
+            .then(() => {
+                if (hadError) alert('部分页面导出失败，请重试');
+            });
     }
 
     extractAbcjsClefTemplate() {
@@ -171,14 +198,48 @@ class StaffLetter {
                 })();
                 this.clefTemplate = clonePath;
                 this.clefBBox = bb;
-                this._abcStaffTopY = 30;
-                this._abcStaffSpace = abcStaffSpace;
+                const staffGeo = this._measureAbcStaffGeometry(svg);
+                this._abcStaffTopY = staffGeo ? staffGeo.topY : 30;
+                this._abcStaffSpace = staffGeo ? staffGeo.space : abcStaffSpace;
                 this._abcClefBBoxLeft = bb.x;
                 resolve();
             } catch (e) {
                 reject(e);
             }
         });
+    }
+
+    _measureAbcStaffGeometry(svg) {
+        const hLineRe = /^M\s*(-?[\d.]+)\s+(-?[\d.]+)\s+L\s*(-?[\d.]+)\s+(-?[\d.]+)/;
+        const ys = [];
+
+        svg.querySelectorAll('path').forEach(p => {
+            const m = (p.getAttribute('d') || '').match(hLineRe);
+            let y = null;
+            if (m &&
+                Math.abs(parseFloat(m[4]) - parseFloat(m[2])) < 0.5 &&
+                Math.abs(parseFloat(m[3]) - parseFloat(m[1])) > 100) {
+                y = parseFloat(m[2]);
+            } else if ((p.getAttribute('class') || '').indexOf('staff') !== -1) {
+                try {
+                    const bb = p.getBBox();
+                    if (bb.width > 100 && bb.height < 1) y = bb.y;
+                } catch (e) {}
+            }
+            if (y != null) ys.push(y);
+        });
+
+        ys.sort((a, b) => a - b);
+        const unique = [];
+        ys.forEach(y => {
+            if (!unique.length || y - unique[unique.length - 1] > 0.5) unique.push(y);
+        });
+
+        if (unique.length < 5) return null;
+        const topY = unique[0];
+        const space = (unique[4] - unique[0]) / 4;
+        if (!isFinite(space) || space <= 0) return null;
+        return { topY, space };
     }
 
     layoutText(fontSize, fontFamily, maxWidth) {
@@ -229,12 +290,6 @@ class StaffLetter {
         return el;
     }
 
-    _clearSvg() {
-        while (this.svg.firstChild) {
-            this.svg.removeChild(this.svg.firstChild);
-        }
-    }
-
     _ensureDefs() {
         let defs = this.svg.querySelector('defs');
         if (!defs) {
@@ -244,51 +299,134 @@ class StaffLetter {
         return defs;
     }
 
+    letterMode() {
+        const el = document.querySelector('input[name="letterMode"]:checked');
+        return el ? el.value : 'single';
+    }
+
+    _updateModeHint(mode) {
+        if (!this.modeHint) return;
+        this.modeHint.textContent = mode === 'single'
+            ? '所有内容合并为一张纵向长信纸，随内容自动延伸'
+            : '每页固定信纸尺寸，内容自动分配到多张信纸上';
+    }
+
     render() {
         const W = this.W;
-        const H = this.H;
         const staffColor = this.staffColor.value;
         const textColor = this.textColor.value;
         const fontSize = parseInt(this.fontSize.value);
         const lineHeight = parseInt(this.lineHeight.value);
         const fontFamily = this.fontFamily.value;
 
-        this._clearSvg();
-
-        const textMarginLeft = 80;
         const textMarginRight = 60;
-        const marginTop = 130;
+        const firstPageTop = 130;
+        const otherPageTop = 90;
+        const pageBottom = 70;
         const staffPadding = 35;
         const staffLeft = staffPadding;
         const staffRight = W - staffPadding;
         const staffBlockHeight = lineHeight;
         const lineSpacingInStaff = staffBlockHeight / 10;
+
+        let textMarginLeft;
+        if (this.showClef.checked) {
+            const clefWidth = this.clefTemplate
+                ? this.clefBBox.width * (lineSpacingInStaff / this._abcStaffSpace)
+                : lineSpacingInStaff * 3.2;
+            textMarginLeft = Math.ceil(staffLeft + 5 + clefWidth + 15);
+        } else {
+            textMarginLeft = staffLeft + 15;
+        }
         const maxTextWidth = W - textMarginLeft - textMarginRight;
 
-        this.drawPaperBackground();
-        if (this.showBorder.checked) this.drawBorder();
-
-        this.drawTitle(marginTop - 50, W, textColor, fontFamily, fontSize);
-
         const renderLines = this.layoutText(fontSize, fontFamily, maxTextWidth);
+        const mode = this.letterMode();
 
-        renderLines.forEach((line, idx) => {
-            const staffY = marginTop + idx * staffBlockHeight;
+        this._updateModeHint(mode);
 
-            this.drawSingleStaff(staffLeft, staffRight, staffY, lineSpacingInStaff, staffColor);
+        this.pagesContainer.innerHTML = '';
+        this.pageSvgs = [];
+
+        if (mode === 'single') {
+            const H = Math.max(this.pageH, firstPageTop + renderLines.length * staffBlockHeight + pageBottom);
+            this._createPage(W, H);
+            this.drawPaperBackground();
+            if (this.showBorder.checked) this.drawBorder();
+            this.drawTitle(firstPageTop - 50, W, textColor, fontFamily, fontSize);
+            this._drawStaffLines(renderLines, 0, firstPageTop, {
+                staffLeft, staffRight, staffBlockHeight, lineSpacingInStaff,
+                textMarginLeft, fontSize, textColor, fontFamily, staffColor
+            });
+            return;
+        }
+
+        const capFirst = Math.max(1, Math.floor((this.pageH - firstPageTop - pageBottom) / staffBlockHeight));
+        const capOther = Math.max(1, Math.floor((this.pageH - otherPageTop - pageBottom) / staffBlockHeight));
+
+        const chunks = [];
+        for (let i = 0; i < renderLines.length;) {
+            const cap = chunks.length === 0 ? capFirst : capOther;
+            chunks.push(renderLines.slice(i, i + cap));
+            i += cap;
+        }
+        if (chunks.length === 0) chunks.push([]);
+
+        chunks.forEach((chunk, p) => {
+            this._createPage(W, this.pageH);
+            this.drawPaperBackground();
+            if (this.showBorder.checked) this.drawBorder();
+
+            if (p === 0) {
+                this.drawTitle(firstPageTop - 50, W, textColor, fontFamily, fontSize);
+            } else {
+                this.drawContinuationHeader(otherPageTop - 48, W, textColor, fontFamily, fontSize);
+            }
+
+            const topY = p === 0 ? firstPageTop : otherPageTop;
+            const baseIndex = p === 0 ? 0 : capFirst + (p - 1) * capOther;
+            this._drawStaffLines(chunk, baseIndex, topY, {
+                staffLeft, staffRight, staffBlockHeight, lineSpacingInStaff,
+                textMarginLeft, fontSize, textColor, fontFamily, staffColor
+            });
+
+            this.drawPageFooter(p + 1, chunks.length, W, this.pageH, textColor, fontFamily);
+        });
+    }
+
+    _createPage(w, h) {
+        const svg = this._makeEl('svg', {
+            width: w,
+            height: h,
+            viewBox: `0 0 ${w} ${h}`,
+            xmlns: SVG_NS
+        });
+        this.pagesContainer.appendChild(svg);
+        svg.style.aspectRatio = `${w} / ${h}`;
+        this.pageSvgs.push(svg);
+        this.svg = svg;
+        this.H = h;
+        return svg;
+    }
+
+    _drawStaffLines(lines, baseIndex, topY, o) {
+        lines.forEach((line, i) => {
+            const staffY = topY + i * o.staffBlockHeight;
+
+            this.drawSingleStaff(o.staffLeft, o.staffRight, staffY, o.lineSpacingInStaff, o.staffColor);
 
             if (this.showClef.checked) {
-                this.drawTrebleClef(staffLeft + 5, staffY, lineSpacingInStaff, staffColor);
+                this.drawTrebleClef(o.staffLeft + 5, staffY, o.lineSpacingInStaff, o.staffColor);
             }
 
             if (line.trim()) {
-                this.drawSingleTextLineOnStaff(line, textMarginLeft, staffY,
-                    lineSpacingInStaff, fontSize, textColor, fontFamily);
+                this.drawSingleTextLineOnStaff(line, o.textMarginLeft, staffY,
+                    o.lineSpacingInStaff, o.fontSize, o.textColor, o.fontFamily);
             }
 
             if (this.showNotes.checked && line.trim()) {
-                this.drawDecorativeNotes(textMarginLeft, staffRight,
-                    staffY, lineSpacingInStaff, idx);
+                this.drawDecorativeNotes(o.textMarginLeft, o.staffRight,
+                    staffY, o.lineSpacingInStaff, baseIndex + i);
             }
         });
     }
@@ -392,6 +530,37 @@ class StaffLetter {
         });
         deco.textContent = '♪ ♫ ♬ ♩ ♪';
         this.svg.appendChild(deco);
+    }
+
+    drawContinuationHeader(y, W, color, fontFamily, fontSize) {
+        const t = this._makeEl('text', {
+            x: W / 2,
+            y: y,
+            'text-anchor': 'middle',
+            'dominant-baseline': 'middle',
+            'font-family': fontFamily,
+            'font-size': Math.max(14, fontSize - 6),
+            fill: color,
+            opacity: 0.5
+        });
+        t.textContent = `《${this.letterTitle.value || '无题'}》`;
+        this.svg.appendChild(t);
+    }
+
+    drawPageFooter(pageNo, totalPages, W, H, color, fontFamily) {
+        const t = this._makeEl('text', {
+            x: W / 2,
+            y: H - 32,
+            'text-anchor': 'middle',
+            'dominant-baseline': 'middle',
+            'font-family': fontFamily,
+            'font-size': 15,
+            fill: color,
+            opacity: 0.5,
+            'letter-spacing': '2'
+        });
+        t.textContent = `第 ${pageNo} 页 · 共 ${totalPages} 页`;
+        this.svg.appendChild(t);
     }
 
     drawSingleStaff(left, right, y, spacing, color) {
@@ -500,18 +669,28 @@ class StaffLetter {
         const centerLineY = staffTopY + lineSpacing * 2;
         this._measureCtx.font = `${fontSize}px ${fontFamily}`;
 
+        // 不用 dominant-baseline（跨浏览器及导出栅格化行为不一致），
+        // 按汉字“静”的实际字形盒算出视觉中心到基线的偏移，使整行视觉中心落在谱表中线上
+        let half = fontSize * 0.36;
+        try {
+            const m = this._measureCtx.measureText('静');
+            if (m && m.actualBoundingBoxAscent > 0) {
+                half = (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2;
+            }
+        } catch (e) {}
+
         let currentX = x;
         for (let i = 0; i < text.length; i++) {
             const ch = text[i];
             const charWidth = this._measureCtx.measureText(ch).width;
             const wave = Math.sin((currentX + i * 3) * 0.015) * 0.8;
             const tilt = (Math.random() - 0.5) * 0.8;
+            const baselineY = centerLineY + wave + half;
 
             const t = this._makeEl('text', {
                 x: currentX + charWidth / 2,
-                y: centerLineY + wave,
+                y: baselineY,
                 'text-anchor': 'middle',
-                'dominant-baseline': 'middle',
                 'font-family': fontFamily,
                 'font-size': fontSize,
                 fill: color,
@@ -526,10 +705,10 @@ class StaffLetter {
     drawDecorativeNotes(left, right, y, spacing, seed) {
         const notePatterns = ['♪', '♫', '♬', '♩'];
         const noteColors = [
-            'rgba(102, 126, 234, 0.35)',
-            'rgba(118, 75, 162, 0.35)',
-            'rgba(240, 147, 251, 0.35)',
-            'rgba(245, 87, 108, 0.3)',
+            'rgb(102, 126, 234)',
+            'rgb(118, 75, 162)',
+            'rgb(240, 147, 251)',
+            'rgb(245, 87, 108)',
         ];
 
         const noteCount = 2 + Math.floor(Math.random() * 3);
@@ -548,7 +727,12 @@ class StaffLetter {
             const colorIndex = Math.floor(Math.random() * noteColors.length);
             const lineOffset = Math.floor(Math.random() * 5);
             const ny = y + lineOffset * spacing;
-            const size = 14 + Math.random() * 8;
+            // 拉大尺寸与透明度跨度，让音符层次更有节奏感。
+            const sizeSteps = [9, 12, 17, 23, 30];
+            const opacitySteps = [0.16, 0.28, 0.48, 0.72, 0.94];
+            const variationIndex = (seed * 3 + i * 2 + Math.floor(nx)) % sizeSteps.length;
+            const size = sizeSteps[variationIndex] + Math.random() * 2;
+            const opacity = opacitySteps[(variationIndex + colorIndex) % opacitySteps.length];
             const wobble = Math.sin(seed * 0.5 + nx * 0.01) * 3;
             const rot = (Math.random() - 0.5) * 0.3 * 180 / Math.PI;
 
@@ -560,7 +744,7 @@ class StaffLetter {
                 'font-family': 'serif',
                 'font-size': size,
                 fill: noteColors[colorIndex],
-                opacity: 0.8,
+                opacity: opacity,
                 transform: `rotate(${rot} ${nx} ${ny + wobble})`
             });
             t.textContent = notePatterns[noteIndex];
